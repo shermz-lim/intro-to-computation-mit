@@ -9,6 +9,7 @@ epsilon = 0.00001
 low = 0 
 high = max(1.0, x) 
 guess = (high + low)/2
+numGuesses = 1 
 
 while abs(guess**2 - x) >= epsilon:
     if guess**2 > x:
@@ -16,5 +17,7 @@ while abs(guess**2 - x) >= epsilon:
     else: 
         low = guess 
     guess = (high + low)/2
+    numGuesses += 1
 
-print("The square root of {} is approximately {}".format(x, guess))            
+print("The square root of {} is approximately {}".format(x, guess))     
+print("Number of guesses took: {}".format(numGuesses))       
