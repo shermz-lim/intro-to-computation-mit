@@ -1,4 +1,4 @@
-# /usr/bin/python3
+#! /usr/bin/python3
 # solution to pset 1a - House Hunting 
 
 # Obtaining initial variables from user

@@ -1,4 +1,4 @@
-# /usr/bin/python3
+#! /usr/bin/python3
 # solution to pset 1b - Saving, with a raise.  
 # similar to 1a, but factoring in a raise every 6 months 
 
