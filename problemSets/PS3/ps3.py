@@ -182,7 +182,15 @@ def update_hand(hand, word):
     returns: dictionary (string -> int)
     """
 
-    pass  # TO DO... Remove this line when you implement this function
+    new_hand = hand.copy()
+    word = word.lower()
+    for char in word: 
+        try:
+            if new_hand[char] > 0:
+                new_hand[char] = new_hand[char] - 1
+        except KeyError:
+            continue    
+    return new_hand        
 
 #
 # Problem #3: Test word validity
@@ -198,8 +206,19 @@ def is_valid_word(word, hand, word_list):
     word_list: list of lowercase strings
     returns: boolean
     """
+    word = word.lower()
 
-    pass  # TO DO... Remove this line when you implement this function
+    if word not in word_list:
+        return False 
+    hand = hand.copy()
+    for char in word:
+        try:
+            hand[char] = hand[char] - 1
+            if hand[char] < 0:
+                return False
+        except KeyError:
+            return False    
+    return True          
 
 #
 # Problem #5: Playing a hand
