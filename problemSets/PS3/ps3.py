@@ -286,7 +286,7 @@ def play_hand(hand, word_list):
     while sum(hand.values()) > 0: 
         n = sum(hand.values())
         # Display the hand
-        print("Current Hand:", end=" ")
+        print("\nCurrent Hand:", end=" ")
         display_hand(hand)
         # Ask user for input
         word = input("Enter word, or '!!' to indicate that you are finished: ")
@@ -315,7 +315,8 @@ def play_hand(hand, word_list):
     # so tell user the total score
     if sum(hand.values()) == 0:
         print("Ran out of letters.", end=" ")
-    print("Total score: {}".format(total_score))    
+    print("Total score: {}".format(total_score)) 
+    print("---------------------")   
 
     # Return the total score as result of function
     return total_score
@@ -353,7 +354,27 @@ def substitute_hand(hand, letter):
     returns: dictionary (string -> int)
     """
     
-    pass  # TO DO... Remove this line when you implement this function
+    hand = hand.copy()
+    current_letters = hand.keys()
+
+    # if letter not in hand, return same hand
+    if letter not in current_letters:
+        return hand 
+
+    # else, substitute hand 
+    letter_value = hand[letter]
+    # Selecting random letter that is not in current_letters
+    while True:
+        new_letter = random.choice(VOWELS + CONSONANTS)
+        if new_letter not in current_letters:
+            break
+    # Deleting letter from hand 
+    del hand[letter]
+    # Adding new letter in 
+    hand[new_letter] = letter_value
+
+    # return new hand 
+    return hand 
        
     
 def play_game(word_list):
@@ -387,8 +408,67 @@ def play_game(word_list):
     word_list: list of lowercase strings
     """
     
-    print("play_game not implemented.") # TO DO... Remove this line when you implement this function
-    
+    # ask user for number of hands 
+    while True:
+        try:
+            numHands = int(input("Enter total number of hands (integer): "))
+            break
+        except ValueError:
+            print("Enter an integer.")    
+
+    # keeps track of total game score 
+    game_total_score = 0
+    substitute_chance = 1 
+    replay_chance = 1 
+
+    # starts playing numHands number of games 
+    while numHands > 0:
+        # Starts playing each game
+        # Get hand
+        hand = deal_hand(HAND_SIZE)
+        # Ask user whether want to substitute hand before playing if he can
+        if substitute_chance > 0:
+            print("\nCurrent hand: ", end="")
+            display_hand(hand)
+            while True:
+                user_sub_answer = input("Would you like to substitute a letter? (yes/no): ")
+                user_sub_answer = user_sub_answer.lower()
+                # If yes, substitutes hand and return new hand
+                if user_sub_answer == 'yes': 
+                    user_letter = input("Which letter would you like to replace: ")
+                    hand = substitute_hand(hand, user_letter)
+                    # take away option to substitute letters 
+                    substitute_chance -= 1
+                    break
+                # If no, continue with hand 
+                elif user_sub_answer == 'no':
+                    break   
+        # At most 2 tries      
+        # keeps track of both scores if player replays    
+        hand_scores = []
+        while True:    
+            # play hand and appends score to hand_scores 
+            hand_score = play_hand(hand, word_list)
+            hand_scores.append(hand_score)
+
+            # Asks player if he wants to replay if a replay is not used yet
+            if replay_chance > 0:
+                # Getting the correct input 
+                while True:
+                    replay_answer = input("Would you like to replay the hand? (yes/no): ")
+                    replay_answer = replay_answer.lower()
+                    if replay_answer == 'yes' or replay_answer == 'no':
+                        break
+                if replay_answer == 'yes':
+                    replay_chance -= 1
+                    continue 
+            break             
+        numHands -= 1    
+        final_hand_score = max(hand_scores)    
+        game_total_score += final_hand_score
+    print("Total score over all hands: " + str(game_total_score))    
+
+
 
 
 #
