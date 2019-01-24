@@ -4,6 +4,7 @@
 # Time Spent: x:xx
 
 import string
+import operator 
 
 ### HELPER CODE ###
 def load_words(file_name):
@@ -148,7 +149,6 @@ class Message(object):
         '''
         # builds the shift dict using shift 
         shiftDict = self.build_shift_dict(shift)
-        print(shiftDict)
 
         new_text = ''
         # loop through every character in message
@@ -236,7 +236,7 @@ class CiphertextMessage(Message):
             self.message_text (string, determined by input text)
             self.valid_words (list, determined using helper function load_words)
         '''
-        pass #delete this line and replace with your code here
+        Message.__init__(self, text)
 
     def decrypt_message(self):
         '''
@@ -254,23 +254,53 @@ class CiphertextMessage(Message):
         Returns: a tuple of the best shift value used to decrypt the message
         and the decrypted message text using that shift value
         '''
-        pass #delete this line and replace with your code here
+        # a dictionary of shift value -> valid words 
+        shift_words = {}
+        # trying out all 25 shift values that will give the max number of words 
+        for i in range(1, 25):
+            # apply shift to obtain new text
+            new_text = self.apply_shift(i)
+            # check number of valid words in new_text
+            countValidWords = 0 
+            words = new_text.split() # list of words in text 
+            for word in words:
+                if is_word(self.valid_words, word):
+                    countValidWords += 1 
+            # appends shift value: no. of valid words to shift_words dictionary 
+            shift_words[i] = countValidWords        
+
+        # determine shift value that gives greatest number of valid words  
+        best_shift = max(shift_words.items(), key=operator.itemgetter(1))[0]
+        # obtaining decrypted message using shift value 
+        decrypted_message = self.apply_shift(best_shift)
+
+        return (best_shift, decrypted_message)
+
 
 if __name__ == '__main__':
 
-#    #Example test case (PlaintextMessage)
-#    plaintext = PlaintextMessage('hello', 2)
-#    print('Expected Output: jgnnq')
-#    print('Actual Output:', plaintext.get_message_text_encrypted())
-#
-#    #Example test case (CiphertextMessage)
-#    ciphertext = CiphertextMessage('jgnnq')
-#    print('Expected Output:', (24, 'hello'))
-#    print('Actual Output:', ciphertext.decrypt_message())
+    #Example test case (PlaintextMessage)
+    plaintext = PlaintextMessage('hello', 2)
+    plaintext.get_encryption_dict()
+    print('Expected Output: jgnnq')
+    print('Actual Output:', plaintext.get_message_text_encrypted())
+
+
+   #Example test case (CiphertextMessage)
+    ciphertext = CiphertextMessage('jgnnq')
+    print('Expected Output:', (24, 'hello'))
+    print('Actual Output:', ciphertext.decrypt_message())
 
     #TODO: WRITE YOUR TEST CASES HERE
+    plaintext = PlaintextMessage('what the', 3)
+    plaintext.get_encryption_dict()
+    print('Actual Output:', plaintext.get_message_text_encrypted())
+
+    ciphertext = CiphertextMessage(plaintext.get_message_text_encrypted())
+    print('Actual Output:', ciphertext.decrypt_message())
+
 
     #TODO: best shift value and unencrypted story 
     
-    pass 
+
 
