@@ -142,6 +142,7 @@ class DescriptionTrigger(PhraseTrigger):
 class TimeTrigger(Trigger):
     def __init__(self, time):
         dt = datetime.strptime(time, "%d %b %Y %H:%M:%S")
+        dt = dt.replace(tzinfo=pytz.timezone("UTC"))
         self.time = dt 
 
 
@@ -149,14 +150,14 @@ class TimeTrigger(Trigger):
 # TODO: BeforeTrigger and AfterTrigger
 class BeforeTrigger(TimeTrigger):
     def evaluate(self, story):
-        if story.pubdate < self.time:
+        if story.pubdate.replace(tzinfo=pytz.timezone("UTC")) < self.time:
             return True 
         else:
             return False     
 
 class AfterTrigger(TimeTrigger):
     def evaluate(self, story):
-        if story.pubdate > self.time:
+        if story.pubdate.replace(tzinfo=pytz.timezone("UTC")) > self.time:
             return True 
         else:
             return False     
@@ -201,9 +202,13 @@ def filter_stories(stories, triggerlist):
     Returns: a list of only the stories for which a trigger in triggerlist fires.
     """
     # TODO: Problem 10
-    # This is a placeholder
-    # (we're just returning all the stories, with no filtering)
-    return stories
+    filtered_stories = []
+    for story in stories:
+        for trigger in triggerlist:
+            if trigger.evaluate(story):
+                filtered_stories.append(story)
+                break 
+    return filtered_stories            
 
 
 
@@ -230,8 +235,43 @@ def read_trigger_config(filename):
     # TODO: Problem 11
     # line is the list of lines that you need to parse and for which you need
     # to build triggers
+    triggers_list = []
+    triggers_dict = {}
 
-    print(lines) # for now, print it so you see what it contains!
+    for line in lines:
+        arguments = line.split(',')
+        if arguments[0] == "ADD":
+            for trigger_name in arguments[1:]:
+                triggers_list.append(triggers_dict[trigger_name])
+        else:
+            trigger_name = arguments[1]
+            name = arguments[0]
+            if trigger_name == "TITLE":
+                phrase = arguments[2]
+                triggers_dict[name] = TitleTrigger(phrase)
+            elif trigger_name == "DESCRIPTION":
+                phrase = arguments[2]
+                triggers_dict[name] = DescriptionTrigger(phrase)    
+            elif trigger_name == "AFTER":
+                date = arguments[2]
+                triggers_dict[name] = AfterTrigger(date)   
+            elif trigger_name == "BEFORE":
+                date = arguments[2]
+                triggers_dict[name] = BeforeTrigger(date)       
+            elif trigger_name == "NOT":
+                T1 = arguments[2]
+                triggers_dict[name] = NotTrigger(triggers_dict[T1])
+            elif trigger_name == "AND":
+                T1, T2 = arguments[2], arguments[3]
+                triggers_dict[name] = AndTrigger(triggers_dict[T1], triggers_dict[T2]) 
+            elif trigger_name == "OR":
+                T1, T2 = arguments[2], arguments[3]
+                triggers_dict[name] = OrTrigger(triggers_dict[T1], triggers_dict[T2])          
+            else:
+                pass
+
+
+    return triggers_list
 
 
 
@@ -241,15 +281,15 @@ def main_thread(master):
     # A sample trigger list - you might need to change the phrases to correspond
     # to what is currently in the news
     try:
-        t1 = TitleTrigger("election")
-        t2 = DescriptionTrigger("Trump")
-        t3 = DescriptionTrigger("Clinton")
-        t4 = AndTrigger(t2, t3)
-        triggerlist = [t1, t4]
+        # t1 = TitleTrigger("SAF")
+        # t2 = DescriptionTrigger("aloysius")
+        # t3 = DescriptionTrigger("Singapore")
+        # t4 = AndTrigger(t2, t3)
+        # triggerlist = [t1, t4]
 
         # Problem 11
         # TODO: After implementing read_trigger_config, uncomment this line 
-        # triggerlist = read_trigger_config('triggers.txt')
+        triggerlist = read_trigger_config('triggers.txt')
         
         # HELPER CODE - you don't need to understand this!
         # Draws the popup window that displays the filtered stories

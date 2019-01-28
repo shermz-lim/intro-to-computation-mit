@@ -118,17 +118,17 @@ class ProblemSet5(unittest.TestCase):
 
         dt = timedelta(seconds=5)
         now = datetime(2016, 10, 12, 23, 59, 59)
-        now = now.replace(tzinfo=pytz.timezone("EST"))
+        now = now.replace(tzinfo=pytz.timezone("UTC"))
         
         ancient_time = datetime(1987, 10, 15)
-        ancient_time = ancient_time.replace(tzinfo=pytz.timezone("EST"))
+        ancient_time = ancient_time.replace(tzinfo=pytz.timezone("UTC"))
         ancient = NewsStory('', '', '', '', ancient_time)
         
         just_now = NewsStory('', '', '', '', now - dt)
         in_a_bit = NewsStory('', '', '', '', now + dt)
         
         future_time = datetime(2087, 10, 15)
-        future_time = future_time.replace(tzinfo=pytz.timezone("EST"))
+        future_time = future_time.replace(tzinfo=pytz.timezone("UTC"))
         future = NewsStory('', '', '', '', future_time)
 
 
