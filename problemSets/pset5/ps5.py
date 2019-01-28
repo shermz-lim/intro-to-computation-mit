@@ -138,15 +138,38 @@ class DescriptionTrigger(PhraseTrigger):
 # Constructor:
 #        Input: Time has to be in EST and in the format of "%d %b %Y %H:%M:%S".
 #        Convert time from string to a datetime before saving it as an attribute.
+#        "3 Oct 2016 17:00:10 ".
+class TimeTrigger(Trigger):
+    def __init__(self, time):
+        dt = datetime.strptime(time, "%d %b %Y %H:%M:%S")
+        self.time = dt 
+
 
 # Problem 6
 # TODO: BeforeTrigger and AfterTrigger
+class BeforeTrigger(TimeTrigger):
+    def evaluate(self, story):
+        if story.pubdate < self.time:
+            return True 
+        else:
+            return False     
 
+class AfterTrigger(TimeTrigger):
+    def evaluate(self, story):
+        if story.pubdate > self.time:
+            return True 
+        else:
+            return False     
 
 # COMPOSITE TRIGGERS
 
 # Problem 7
 # TODO: NotTrigger
+class NotTrigger(Trigger):
+    def __init__(self, T):
+        self.trigger = T
+    def evaluate(self, story):
+        return not self.trigger.evaluate(story)    
 
 # Problem 8
 # TODO: AndTrigger
